@@ -70,7 +70,14 @@ public extension CodeLanguage {
     static let bash: CodeLanguage = .init(
         id: .bash,
         tsName: "bash",
-        extensions: ["sh", "bash"],
+        extensions: [
+            "sh", "bash",
+            // Dotfiles / config without a dedicated tree-sitter grammar yet — highlighted as
+            // shell (comments, strings, assignments). Real grammars are a follow-up.
+            "env", ".env",
+            "gitignore", ".gitignore",
+            "htaccess", ".htaccess"
+        ],
         lineCommentString: "#",
         rangeCommentStrings: (":'", "'"),
         highlights: ["folds", "injections", "locals"]
