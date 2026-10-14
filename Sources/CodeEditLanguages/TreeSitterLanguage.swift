@@ -17,6 +17,7 @@ public enum TreeSitterLanguage: String {
     case css
     case dart
     case dockerfile
+    case dotenv
     case elixir
     case go
     case goMod

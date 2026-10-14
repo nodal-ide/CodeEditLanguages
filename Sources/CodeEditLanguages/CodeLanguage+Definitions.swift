@@ -21,6 +21,7 @@ public extension CodeLanguage {
         .css,
         .dart,
         .dockerfile,
+        .dotenv,
         .elixir,
         .go,
         .goMod,
@@ -72,15 +73,24 @@ public extension CodeLanguage {
         tsName: "bash",
         extensions: [
             "sh", "bash",
-            // Dotfiles / config without a dedicated tree-sitter grammar yet — highlighted as
-            // shell (comments, strings, assignments). Real grammars are a follow-up.
-            "env", ".env",
+            // Remaining dotfiles / config without a dedicated tree-sitter grammar yet —
+            // highlighted as shell (comments, strings, assignments). Real grammars are a follow-up.
             "gitignore", ".gitignore",
             "htaccess", ".htaccess"
         ],
         lineCommentString: "#",
         rangeCommentStrings: (":'", "'"),
         highlights: ["folds", "injections", "locals"]
+    )
+
+    /// A language structure for `dotenv` (`.env` files)
+    static let dotenv: CodeLanguage = .init(
+        id: .dotenv,
+        tsName: "dotenv",
+        extensions: ["env", ".env"],
+        lineCommentString: "#",
+        rangeCommentStrings: ("", ""),
+        highlights: ["highlights"]
     )
 
     /// A language structure for `C`

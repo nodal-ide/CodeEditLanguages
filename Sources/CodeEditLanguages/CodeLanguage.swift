@@ -9,6 +9,7 @@ import Foundation
 import TreeSitter
 import SwiftTreeSitter
 import CodeLanguages_Container
+import TreeSitterDotenv
 import RegexBuilder
 
 /// A structure holding metadata for code languages
@@ -103,6 +104,8 @@ public struct CodeLanguage {
             return tree_sitter_dart()
         case .dockerfile:
             return tree_sitter_dockerfile()
+        case .dotenv:
+            return tree_sitter_dotenv()
         case .elixir:
             return tree_sitter_elixir()
         case .go:

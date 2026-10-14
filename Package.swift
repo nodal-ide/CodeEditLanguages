@@ -17,11 +17,16 @@ let package = Package(
             url: "https://github.com/ChimeHQ/SwiftTreeSitter.git",
             from: "0.9.0"
         ),
+        .package(path: "../tree-sitter-dotenv"),
     ],
     targets: [
         .target(
             name: "CodeEditLanguages",
-            dependencies: ["CodeLanguagesContainer", "SwiftTreeSitter"],
+            dependencies: [
+                "CodeLanguagesContainer",
+                "SwiftTreeSitter",
+                .product(name: "TreeSitterDotenv", package: "tree-sitter-dotenv"),
+            ],
             resources: [
                 .copy("Resources")
             ],

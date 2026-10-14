@@ -36,6 +36,8 @@ public class TreeSitterModel {
             return dartQuery
         case .dockerfile:
             return dockerfileQuery
+        case .dotenv:
+            return dotenvQuery
         case .elixir:
             return elixirQuery
         case .go:
@@ -140,6 +142,11 @@ public class TreeSitterModel {
     /// Query for `Dockerfile` files.
     public private(set) lazy var dockerfileQuery: Query? = {
         return queryFor(.dockerfile)
+    }()
+
+    /// Query for `dotenv` files.
+    public private(set) lazy var dotenvQuery: Query? = {
+        return queryFor(.dotenv)
     }()
 
     /// Query for `Elixir` files.
