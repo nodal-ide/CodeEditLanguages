@@ -18,6 +18,8 @@ let package = Package(
             from: "0.9.0"
         ),
         .package(path: "../tree-sitter-dotenv"),
+        .package(path: "../tree-sitter-gitignore"),
+        .package(path: "../tree-sitter-apacheconf"),
     ],
     targets: [
         .target(
@@ -26,6 +28,8 @@ let package = Package(
                 "CodeLanguagesContainer",
                 "SwiftTreeSitter",
                 .product(name: "TreeSitterDotenv", package: "tree-sitter-dotenv"),
+                .product(name: "TreeSitterGitignore", package: "tree-sitter-gitignore"),
+                .product(name: "TreeSitterApacheconf", package: "tree-sitter-apacheconf"),
             ],
             resources: [
                 .copy("Resources")

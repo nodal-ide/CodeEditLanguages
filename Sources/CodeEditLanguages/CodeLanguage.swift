@@ -10,6 +10,8 @@ import TreeSitter
 import SwiftTreeSitter
 import CodeLanguages_Container
 import TreeSitterDotenv
+import TreeSitterGitignore
+import TreeSitterApacheconf
 import RegexBuilder
 
 /// A structure holding metadata for code languages
@@ -90,6 +92,8 @@ public struct CodeLanguage {
         switch id {
         case .agda:
             return tree_sitter_agda()
+        case .apacheconf:
+            return tree_sitter_apacheconf()
         case .bash:
             return tree_sitter_bash()
         case .c:
@@ -108,6 +112,8 @@ public struct CodeLanguage {
             return tree_sitter_dotenv()
         case .elixir:
             return tree_sitter_elixir()
+        case .gitignore:
+            return tree_sitter_gitignore()
         case .go:
             return tree_sitter_go()
         case .goMod:

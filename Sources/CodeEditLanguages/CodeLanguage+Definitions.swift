@@ -14,6 +14,7 @@ public extension CodeLanguage {
     /// An array of all language structures.
     static let allLanguages: [CodeLanguage] = [
         .agda,
+        .apacheconf,
         .bash,
         .c,
         .cpp,
@@ -23,6 +24,7 @@ public extension CodeLanguage {
         .dockerfile,
         .dotenv,
         .elixir,
+        .gitignore,
         .go,
         .goMod,
         .haskell,
@@ -72,11 +74,7 @@ public extension CodeLanguage {
         id: .bash,
         tsName: "bash",
         extensions: [
-            "sh", "bash",
-            // Remaining dotfiles / config without a dedicated tree-sitter grammar yet —
-            // highlighted as shell (comments, strings, assignments). Real grammars are a follow-up.
-            "gitignore", ".gitignore",
-            "htaccess", ".htaccess"
+            "sh", "bash"
         ],
         lineCommentString: "#",
         rangeCommentStrings: (":'", "'"),
@@ -91,6 +89,25 @@ public extension CodeLanguage {
         lineCommentString: "#",
         rangeCommentStrings: ("", ""),
         highlights: ["highlights"]
+    )
+
+    /// A language structure for `Git Ignore`
+    static let gitignore: CodeLanguage = .init(
+        id: .gitignore,
+        tsName: "gitignore",
+        extensions: ["gitignore", ".gitignore"],
+        lineCommentString: "#",
+        rangeCommentStrings: ("", "")
+    )
+
+    /// A language structure for `ApacheConf` (`.htaccess` / httpd config)
+    static let apacheconf: CodeLanguage = .init(
+        id: .apacheconf,
+        tsName: "apacheconf",
+        extensions: [".htaccess", "htaccess", "apacheconf"],
+        lineCommentString: "#",
+        rangeCommentStrings: ("", ""),
+        highlights: ["indents"]
     )
 
     /// A language structure for `C`

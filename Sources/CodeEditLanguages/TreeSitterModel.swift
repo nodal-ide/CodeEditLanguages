@@ -22,6 +22,8 @@ public class TreeSitterModel {
         switch language {
         case .agda:
             return nil
+        case .apacheconf:
+            return apacheconfQuery
         case .bash:
             return bashQuery
         case .c:
@@ -40,6 +42,8 @@ public class TreeSitterModel {
             return dotenvQuery
         case .elixir:
             return elixirQuery
+        case .gitignore:
+            return gitignoreQuery
         case .go:
             return goQuery
         case .goMod:
@@ -147,6 +151,16 @@ public class TreeSitterModel {
     /// Query for `dotenv` files.
     public private(set) lazy var dotenvQuery: Query? = {
         return queryFor(.dotenv)
+    }()
+
+    /// Query for `ApacheConf` files.
+    public private(set) lazy var apacheconfQuery: Query? = {
+        return queryFor(.apacheconf)
+    }()
+
+    /// Query for `Git Ignore` files.
+    public private(set) lazy var gitignoreQuery: Query? = {
+        return queryFor(.gitignore)
     }()
 
     /// Query for `Elixir` files.
