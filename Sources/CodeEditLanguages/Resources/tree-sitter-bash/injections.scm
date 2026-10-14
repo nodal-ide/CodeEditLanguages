@@ -12,17 +12,15 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ((comment) @injection.content
   (#set! injection.language "comment"))
 
 ((regex) @injection.content
   (#set! injection.language "regex"))
 
-((heredoc_redirect
+(heredoc_redirect
   (heredoc_body) @injection.content
   (heredoc_end) @injection.language)
-  (#downcase! @injection.language))
 
 ; printf 'format'
 ((command
@@ -92,3 +90,15 @@
   (#offset! @injection.content 0 1 0 -1)
   (#set! injection.include-children)
   (#set! injection.language "readline"))
+
+((command
+  name: (command_name) @_command
+  .
+  argument: [
+    (string)
+    (raw_string)
+  ] @injection.content)
+  (#eq? @_command "trap")
+  (#offset! @injection.content 0 1 0 -1)
+  (#set! injection.include-children)
+  (#set! injection.self))

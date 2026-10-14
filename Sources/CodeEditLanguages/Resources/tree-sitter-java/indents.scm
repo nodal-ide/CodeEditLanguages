@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ; format-ignore
 [
   ; ... refers to the portion that this indent query will have effects on

@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ; -----------------------------------------------------------------------------
 ; General language injection
 (quasiquote
@@ -94,6 +93,18 @@
 ; Python
 ; inline-python
 (quasiquote
-  (quoter) @injection.language
-  (#any-of? @injection.language "pymain" "pye" "py_" "pyf")
-  (quasiquote_body) @injection.content)
+  (quoter) @_name
+  (#any-of? @_name "pymain" "pye" "py_" "pyf")
+  (quasiquote_body) @injection.content
+  (#set! injection.language "python"))
+
+; -----------------------------------------------------------------------------
+; GraphQL
+; morpheus-graphql-client
+(_
+  function: (apply
+    function: (variable) @_name)
+  argument: (quasiquote
+    body: (quasiquote_body) @injection.content)
+  (#set! injection.language "graphql")
+  (#eq? @_name "declareLocalTypesInline"))

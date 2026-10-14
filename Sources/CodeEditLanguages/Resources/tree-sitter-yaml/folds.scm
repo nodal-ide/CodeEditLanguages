@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 [
   (block_mapping_pair)
   (block_sequence_item)

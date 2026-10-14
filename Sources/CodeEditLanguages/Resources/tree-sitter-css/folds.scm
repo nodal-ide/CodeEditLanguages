@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 [
   ; top-level block statements from https://github.com/tree-sitter/tree-sitter-css/blob/master/grammar.js
   ; note: (block) is not used due to unideal behavior when node before block node spans multiple lines

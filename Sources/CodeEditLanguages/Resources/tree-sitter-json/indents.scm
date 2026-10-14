@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 [
   (object)
   (array)
@@ -22,3 +21,5 @@
   "}"
   "]"
 ] @indent.branch
+
+(comment) @indent.ignore

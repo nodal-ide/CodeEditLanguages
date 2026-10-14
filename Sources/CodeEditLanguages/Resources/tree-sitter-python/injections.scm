@@ -12,14 +12,32 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
+(call
+  function: (attribute
+    object: (identifier) @_re)
+  arguments: (argument_list
+    (string
+      (string_start)
+      [
+        (string_content) @injection.content
+        (interpolation)
+      ]+
+      (string_end)))
+  (#eq? @_re "re")
+  (#set! injection.language "regex"))
 
 (call
   function: (attribute
     object: (identifier) @_re)
   arguments: (argument_list
-    .
-    (string
-      (string_content) @injection.content))
+    (concatenated_string
+      (string
+        (string_start)
+        [
+          (string_content) @injection.content
+          (interpolation)
+        ]+
+        (string_end))))
   (#eq? @_re "re")
   (#set! injection.language "regex"))
 

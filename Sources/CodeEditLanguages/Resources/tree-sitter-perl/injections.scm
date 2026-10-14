@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ; an injections.scm file for nvim-treesitter
 ((comment) @injection.content
   (#set! injection.language "comment"))
@@ -28,3 +27,6 @@
   (#not-lua-match? @_modifiers "e.*e")
   (#set! injection.language "perl")
   (#set! injection.include-children))
+
+(heredoc_content
+  (heredoc_end) @injection.language) @injection.content

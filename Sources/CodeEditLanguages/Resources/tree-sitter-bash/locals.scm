@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ; Scopes
 (function_definition) @local.scope
 

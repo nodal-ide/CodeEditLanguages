@@ -12,14 +12,24 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ((comment) @injection.content
   (#set! injection.language "comment"))
 
+((comment) @injection.content
+  (#lua-match? @injection.content "^#:")
+  (#set! injection.language "rbs"))
+
+((comment) @injection.content
+  (#lua-match? @injection.content "^#%s+@rbs")
+  (#set! injection.language "rbs"))
+
+((comment) @injection.content
+  (#lua-match? @injection.content "^#%s+|")
+  (#set! injection.language "rbs"))
+
 (heredoc_body
   (heredoc_content) @injection.content
-  (heredoc_end) @injection.language
-  (#downcase! @injection.language))
+  (heredoc_end) @injection.language)
 
 (regex
   (string_content) @injection.content

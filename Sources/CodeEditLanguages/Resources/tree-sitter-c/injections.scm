@@ -12,9 +12,8 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ((preproc_arg) @injection.content
-  (#set! injection.language "c"))
+  (#set! injection.self))
 
 ((comment) @injection.content
   (#set! injection.language "comment"))
@@ -24,7 +23,7 @@
   (#set! injection.language "re2c"))
 
 ((comment) @injection.content
-  (#lua-match? @injection.content "/[*\/][!*\/]<?[^a-zA-Z]")
+  (#lua-match? @injection.content "/[*/][!*/]<?[^a-zA-Z]")
   (#set! injection.language "doxygen"))
 
 ((call_expression

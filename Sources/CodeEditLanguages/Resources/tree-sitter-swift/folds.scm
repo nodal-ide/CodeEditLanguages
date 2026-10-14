@@ -12,7 +12,6 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-
 ; format-ignore
 [
   (protocol_body)               ; protocol Foo { ... }
@@ -41,7 +40,7 @@
   (tuple_expression)            ; ( foo + bar )
   (array_literal)               ; [ foo, bar ]
   (dictionary_literal)          ; [ foo: bar, x: y ]
-  (lambda_literal) 
+  (lambda_literal)
   (willset_didset_block)
   (willset_clause)
   (didset_clause)
