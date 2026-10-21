@@ -373,7 +373,7 @@ public extension CodeLanguage {
         extensions: ["php"],
         lineCommentString: "//",
         rangeCommentStrings: ("/*", "*/"),
-        highlights: ["folds", "indents", "injections", "locals", "tags"]
+        highlights: ["folds", "indents", "injections", "injections-text", "locals", "tags"]
     )
 
     /// A language structure for `Python`
