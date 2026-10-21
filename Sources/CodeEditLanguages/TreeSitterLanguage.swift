@@ -55,3 +55,38 @@ public enum TreeSitterLanguage: String {
     case zig
     case plainText
 }
+
+public extension TreeSitterLanguage {
+    private static let injectionAliases: [String: TreeSitterLanguage] = [
+        "c#": .cSharp,
+        "csharp": .cSharp,
+        "c-sharp": .cSharp,
+        "c++": .cpp,
+        "js": .javascript,
+        "ts": .typescript,
+        "markdown_inline": .markdownInline,
+        "markdown-inline": .markdownInline,
+        "objective-c": .objc,
+        "objectivec": .objc,
+        "objc": .objc,
+        "yml": .yaml,
+        "go-mod": .goMod,
+        "gomod": .goMod,
+        "ocaml-interface": .ocamlInterface,
+        "ocamlinterface": .ocamlInterface,
+        "plaintext": .plainText,
+        "plain-text": .plainText
+    ]
+
+    /// Resolves an injection query language name, including common aliases.
+    static func fromInjectionName(_ name: String) -> TreeSitterLanguage? {
+        if let exact = TreeSitterLanguage(rawValue: name) {
+            return exact
+        }
+        let normalized = name.lowercased()
+        if let alias = injectionAliases[normalized] {
+            return alias
+        }
+        return TreeSitterLanguage(rawValue: normalized)
+    }
+}

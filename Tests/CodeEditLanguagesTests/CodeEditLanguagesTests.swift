@@ -589,9 +589,9 @@ final class CodeEditLanguagesTests: XCTestCase {
         language.resourceURL = bundleURL
 
         let data = try Data(contentsOf: language.queryURL!)
-        let query = try? Query(language: language.language!, data: data)
+        let query = try Query(language: language.language!, data: data)
         XCTAssertNotNil(query)
-        XCTAssertNotEqual(query?.patternCount, 0)
+        XCTAssertNotEqual(query.patternCount, 0)
     }
 
 // MARK: - Python

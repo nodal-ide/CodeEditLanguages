@@ -40,14 +40,12 @@ public extension CodeLanguage {
     /// - Returns: The detected code language, if any.
     private static func detectLanguageUsingURL(url: URL) -> CodeLanguage? {
         let fileExtension = url.pathExtension.lowercased()
-        let fileName = url.pathComponents.last // should not be lowercase since it has to match e.g. `Dockerfile`
-        // This is to handle special file types without an extension (e.g., Makefile, Dockerfile)
-        let fileNameOrExtension = fileExtension.isEmpty ? (fileName != nil ? fileName! : "") : fileExtension
-        if let lang = allLanguages.first(where: { lang in lang.extensions.contains(fileNameOrExtension)}) {
-            return lang
-        } else {
-            return nil
+        if !fileExtension.isEmpty {
+            return languageForExtension(fileExtension)
         }
+        // Special file types without an extension (e.g., Makefile, Dockerfile).
+        guard let fileName = url.pathComponents.last else { return nil }
+        return languageForFileName(fileName)
     }
 
     /// Detects code langauges from the shebang of a file.
@@ -195,10 +193,6 @@ public extension CodeLanguage {
     /// - Parameter identifier: The identifier to use.
     /// - Returns: The found code language, if any.
     private static func languageFromIdentifier(_ identifier: String) -> CodeLanguage? {
-        return allLanguages.first {
-            $0.tsName == identifier
-            || $0.extensions.contains(identifier)
-            || $0.additionalIdentifiers.contains(identifier)
-        }
+        languageForIdentifier(identifier)
     }
 }

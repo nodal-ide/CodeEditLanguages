@@ -18,7 +18,7 @@ final class LanguageResourcesTests: XCTestCase {
     func test_allResourcesAreReferencedInDefinitions() throws {
         for language in CodeLanguage.allLanguages {
             let resourceURL = try XCTUnwrap(
-                language.resourceURL?.appendingPathComponent("Resources/tree-sitter-\(language.tsName)")
+                language.resourceDirectoryURL?.appendingPathComponent("tree-sitter-\(language.tsName)")
             )
             let resources = try FileManager.default
                 .contentsOfDirectory(
