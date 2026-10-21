@@ -16,16 +16,18 @@ import RegexBuilder
 
 /// A structure holding metadata for code languages
 public struct CodeLanguage {
-    internal init(
-        id: TreeSitterLanguage,
+    public init(
+        id: LanguageID,
         tsName: String,
         extensions: Set<String>,
         lineCommentString: String,
         rangeCommentStrings: (String, String),
         documentationCommentStrings: Set<DocumentationComments> = [],
+        grammar: GrammarReference? = nil,
         parentURL: URL? = nil,
         highlights: Set<String>? = nil,
-        additionalIdentifiers: Set<String> = []
+        additionalIdentifiers: Set<String> = [],
+        resourceURL: URL? = nil
     ) {
         self.id = id
         self.tsName = tsName
@@ -33,13 +35,19 @@ public struct CodeLanguage {
         self.lineCommentString = lineCommentString
         self.rangeCommentStrings = rangeCommentStrings
         self.documentationCommentStrings = documentationCommentStrings
+        self.grammar = grammar ?? id.treeSitterLanguage.map { GrammarReference($0) }
+            ?? GrammarReference(identifier: id.rawValue)
         self.parentQueryURL = parentURL
         self.additionalHighlights = highlights
         self.additionalIdentifiers = additionalIdentifiers
+        self.resourceURL = resourceURL ?? Bundle.module.resourceURL
     }
 
     /// The ID of the language
-    public let id: TreeSitterLanguage
+    public let id: LanguageID
+
+    /// The grammar backing the language.
+    public let grammar: GrammarReference
 
     /// The display name of the language
     public let tsName: String
@@ -70,6 +78,38 @@ public struct CodeLanguage {
         queryURL()
     }
 
+    /// The query files used for syntax highlighting.
+    public var querySet: LanguageQuerySet? {
+        guard let highlights = queryURL else { return nil }
+        let additional = (additionalHighlights ?? [])
+            .filter { $0 != "highlights" }
+            .compactMap { queryURL(for: $0) }
+            .sorted { $0.path < $1.path }
+        return LanguageQuerySet(
+            highlights: highlights,
+            parentHighlights: parentQueryURL,
+            additionalHighlights: additional,
+            injections: queryURL(for: "injections")
+        )
+    }
+
+    /// Metadata describing this language without exposing its grammar distribution.
+    public var definition: LanguageDefinition {
+        LanguageDefinition(
+            id: id,
+            displayName: tsName,
+            grammar: grammar,
+            querySet: querySet,
+            extensions: extensions,
+            additionalIdentifiers: additionalIdentifiers
+        )
+    }
+
+    /// A content-derived version for grammar, query, and metadata invalidation.
+    public var fingerprint: LanguageFingerprint {
+        LanguageFingerprintCache.shared.fingerprint(for: self)
+    }
+
     /// The bundle's resource URL
     internal var resourceURL: URL? = Bundle.module.resourceURL
 
@@ -95,6 +135,7 @@ public struct CodeLanguage {
 
     /// Gets the TSLanguage from `tree-sitter`
     private var tsLanguage: OpaquePointer? {
+        guard let id = id.treeSitterLanguage else { return nil }
         switch id {
         case .agda:
             return tree_sitter_agda()

@@ -14,304 +14,230 @@ public class TreeSitterModel {
     /// The singleton/shared instance of ``TreeSitterModel``.
     public static let shared: TreeSitterModel = .init()
 
-    /// Get a query for a specific language
+    /// Get a query for a specific language.
     /// - Parameter language: The language to request the query for.
-    /// - Returns: A Query if available. Returns `nil` for not implemented languages
-    public func query(for language: TreeSitterLanguage) -> Query? {
-        // swiftlint:disable:previous cyclomatic_complexity function_body_length
-        switch language {
-        case .agda:
-            return nil
-        case .apacheconf:
-            return apacheconfQuery
-        case .bash:
-            return bashQuery
-        case .c:
-            return cQuery
-        case .cpp:
-            return cppQuery
-        case .cSharp:
-            return cSharpQuery
-        case .css:
-            return cssQuery
-        case .dart:
-            return dartQuery
-        case .dockerfile:
-            return dockerfileQuery
-        case .dotenv:
-            return dotenvQuery
-        case .elixir:
-            return elixirQuery
-        case .gitignore:
-            return gitignoreQuery
-        case .go:
-            return goQuery
-        case .goMod:
-            return goModQuery
-        case .haskell:
-            return haskellQuery
-        case .html:
-            return htmlQuery
-        case .java:
-            return javaQuery
-        case .javascript:
-            return javascriptQuery
-        case .jsdoc:
-            return jsdocQuery
-        case .json:
-            return jsonQuery
-        case .jsx:
-            return jsxQuery
-        case .julia:
-            return nil
-        case .kotlin:
-            return kotlinQuery
-        case .lua:
-            return luaQuery
-        case .markdown:
-            return markdownQuery
-        case .markdownInline:
-            return markdownInlineQuery
-        case .objc:
-            return objcQuery
-        case .ocaml:
-            return ocamlQuery
-        case .ocamlInterface:
-            return ocamlInterfaceQuery
-        case .perl:
-            return nil
-        case .php:
-            return phpQuery
-        case .python:
-            return pythonQuery
-        case .regex:
-            return regexQuery
-        case .ruby:
-            return rubyQuery
-        case .rust:
-            return rustQuery
-        case .scala:
-            return scalaQuery
-        case .sql:
-            return sqlQuery
-        case .swift:
-            return swiftQuery
-        case .toml:
-            return tomlQuery
-        case .tsx:
-            return tsxQuery
-        case .typescript:
-            return typescriptQuery
-        case .verilog:
-            return nil
-        case .yaml:
-            return yamlQuery
-        case .zig:
-            return zigQuery
-        case .plainText:
+    /// - Returns: A Query if available. Returns `nil` for unsupported languages.
+    public func query(for language: LanguageID, catalog: LanguageCatalog = .builtIn) -> Query? {
+        guard let codeLanguage = catalog.language(for: language) else {
             return nil
         }
+        let key = QueryCache.Key(language: codeLanguage.id, fingerprint: codeLanguage.fingerprint)
+        if let cached = Self.queryCache.value(for: key) {
+            return cached
+        }
+        guard let query = queryFor(codeLanguage) else {
+            return nil
+        }
+        Self.queryCache.insert(query, for: key)
+        return query
+    }
+
+    /// Compatibility overload for legacy built-in language references.
+    public func query(for language: TreeSitterLanguage) -> Query? {
+        query(for: language.languageID)
     }
 
     /// Query for `Bash` files.
-    public private(set) lazy var bashQuery: Query? = {
-        return queryFor(.bash)
-    }()
+    public var bashQuery: Query? {
+        query(for: .bash)
+    }
 
     /// Query for `C` files.
-    public private(set) lazy var cQuery: Query? = {
-        return queryFor(.c)
-    }()
+    public var cQuery: Query? {
+        query(for: .c)
+    }
 
     /// Query for `C++` files.
-    public private(set) lazy var cppQuery: Query? = {
-        return queryFor(.cpp)
-    }()
+    public var cppQuery: Query? {
+        query(for: .cpp)
+    }
 
     /// Query for `C#` files.
-    public private(set) lazy var cSharpQuery: Query? = {
-        return queryFor(.cSharp)
-    }()
+    public var cSharpQuery: Query? {
+        query(for: .cSharp)
+    }
 
     /// Query for `CSS` files.
-    public private(set) lazy var cssQuery: Query? = {
-        return queryFor(.css)
-    }()
+    public var cssQuery: Query? {
+        query(for: .css)
+    }
 
     /// Query for `Dart` files.
-    public private(set) lazy var dartQuery: Query? = {
-        return queryFor(.dart)
-    }()
+    public var dartQuery: Query? {
+        query(for: .dart)
+    }
 
     /// Query for `Dockerfile` files.
-    public private(set) lazy var dockerfileQuery: Query? = {
-        return queryFor(.dockerfile)
-    }()
+    public var dockerfileQuery: Query? {
+        query(for: .dockerfile)
+    }
 
     /// Query for `dotenv` files.
-    public private(set) lazy var dotenvQuery: Query? = {
-        return queryFor(.dotenv)
-    }()
+    public var dotenvQuery: Query? {
+        query(for: .dotenv)
+    }
 
     /// Query for `ApacheConf` files.
-    public private(set) lazy var apacheconfQuery: Query? = {
-        return queryFor(.apacheconf)
-    }()
+    public var apacheconfQuery: Query? {
+        query(for: .apacheconf)
+    }
 
     /// Query for `Git Ignore` files.
-    public private(set) lazy var gitignoreQuery: Query? = {
-        return queryFor(.gitignore)
-    }()
+    public var gitignoreQuery: Query? {
+        query(for: .gitignore)
+    }
 
     /// Query for `Elixir` files.
-    public private(set) lazy var elixirQuery: Query? = {
-        return queryFor(.elixir)
-    }()
+    public var elixirQuery: Query? {
+        query(for: .elixir)
+    }
 
     /// Query for `Go` files.
-    public private(set) lazy var goQuery: Query? = {
-        return queryFor(.go)
-    }()
+    public var goQuery: Query? {
+        query(for: .go)
+    }
 
     /// Query for `GoMod` files.
-    public private(set) lazy var goModQuery: Query? = {
-        return queryFor(.goMod)
-    }()
+    public var goModQuery: Query? {
+        query(for: .goMod)
+    }
 
     /// Query for `Haskell` files.
-    public private(set) lazy var haskellQuery: Query? = {
-        return queryFor(.haskell)
-    }()
+    public var haskellQuery: Query? {
+        query(for: .haskell)
+    }
 
     /// Query for `HTML` files.
-    public private(set) lazy var htmlQuery: Query? = {
-        return queryFor(.html)
-    }()
+    public var htmlQuery: Query? {
+        query(for: .html)
+    }
 
     /// Query for `Java` files.
-    public private(set) lazy var javaQuery: Query? = {
-        return queryFor(.java)
-    }()
+    public var javaQuery: Query? {
+        query(for: .java)
+    }
 
     /// Query for `JavaScript` files.
-    public private(set) lazy var javascriptQuery: Query? = {
-        return queryFor(.javascript)
-    }()
+    public var javascriptQuery: Query? {
+        query(for: .javascript)
+    }
 
     /// Query for `JSDoc` files.
-    public private(set) lazy var jsdocQuery: Query? = {
-        return queryFor(.jsdoc)
-    }()
+    public var jsdocQuery: Query? {
+        query(for: .jsdoc)
+    }
 
     /// Query for `JSX` files.
-    public private(set) lazy var jsxQuery: Query? = {
-        return queryFor(.jsx)
-    }()
+    public var jsxQuery: Query? {
+        query(for: .jsx)
+    }
 
     /// Query for `JSON` files.
-    public private(set) lazy var jsonQuery: Query? = {
-        return queryFor(.json)
-    }()
+    public var jsonQuery: Query? {
+        query(for: .json)
+    }
 
     /// Query for `Kotlin` files.
-    public private(set) lazy var kotlinQuery: Query? = {
-        return queryFor(.kotlin)
-    }()
+    public var kotlinQuery: Query? {
+        query(for: .kotlin)
+    }
 
     /// Query for `Lua` files.
-    public private(set) lazy var luaQuery: Query? = {
-        return queryFor(.lua)
-    }()
+    public var luaQuery: Query? {
+        query(for: .lua)
+    }
 
     /// Query for `Markdown` files.
-    public private(set) lazy var markdownQuery: Query? = {
-        return queryFor(.markdown)
-    }()
+    public var markdownQuery: Query? {
+        query(for: .markdown)
+    }
 
     /// Query for `Markdown Inline` files.
-    public private(set) lazy var markdownInlineQuery: Query? = {
-        return queryFor(.markdownInline)
-    }()
+    public var markdownInlineQuery: Query? {
+        query(for: .markdownInline)
+    }
 
     /// Query for `Objective C` files.
-    public private(set) lazy var objcQuery: Query? = {
-        return queryFor(.objc)
-    }()
+    public var objcQuery: Query? {
+        query(for: .objc)
+    }
 
     /// Query for `OCaml` files.
-    public private(set) lazy var ocamlQuery: Query? = {
-        return queryFor(.ocaml)
-    }()
+    public var ocamlQuery: Query? {
+        query(for: .ocaml)
+    }
 
     /// Query for `OCaml Interface` files.
-    public private(set) lazy var ocamlInterfaceQuery: Query? = {
-        return queryFor(.ocamlInterface)
-    }()
+    public var ocamlInterfaceQuery: Query? {
+        query(for: .ocamlInterface)
+    }
 
     /// Query for `PHP` files.
-    public private(set) lazy var phpQuery: Query? = {
-        return queryFor(.php)
-    }()
+    public var phpQuery: Query? {
+        query(for: .php)
+    }
 
     /// Query for `Python` files.
-    public private(set) lazy var pythonQuery: Query? = {
-        return queryFor(.python)
-    }()
+    public var pythonQuery: Query? {
+        query(for: .python)
+    }
 
     /// Query for `Regex` files.
-    public private(set) lazy var regexQuery: Query? = {
-        return queryFor(.regex)
-    }()
+    public var regexQuery: Query? {
+        query(for: .regex)
+    }
 
     /// Query for `Ruby` files.
-    public private(set) lazy var rubyQuery: Query? = {
-        return queryFor(.ruby)
-    }()
+    public var rubyQuery: Query? {
+        query(for: .ruby)
+    }
 
     /// Query for `Rust` files.
-    public private(set) lazy var rustQuery: Query? = {
-        return queryFor(.rust)
-    }()
+    public var rustQuery: Query? {
+        query(for: .rust)
+    }
 
     /// Query for `Scala` files.
-    public private(set) lazy var scalaQuery: Query? = {
-        return queryFor(.scala)
-    }()
+    public var scalaQuery: Query? {
+        query(for: .scala)
+    }
 
     /// Query for `SQL` files.
-    public private(set) lazy var sqlQuery: Query? = {
-        return queryFor(.sql)
-    }()
+    public var sqlQuery: Query? {
+        query(for: .sql)
+    }
 
     /// Query for `Swift` files.
-    public private(set) lazy var swiftQuery: Query? = {
-        return queryFor(.swift)
-    }()
+    public var swiftQuery: Query? {
+        query(for: .swift)
+    }
 
     /// Query for `TOML` files.
-    public private(set) lazy var tomlQuery: Query? = {
-        return queryFor(.toml)
-    }()
+    public var tomlQuery: Query? {
+        query(for: .toml)
+    }
 
     /// Query for `TSX` files.
-    public private(set) lazy var tsxQuery: Query? = {
-        return queryFor(.tsx)
-    }()
+    public var tsxQuery: Query? {
+        query(for: .tsx)
+    }
 
     /// Query for `Typescript` files.
-    public private(set) lazy var typescriptQuery: Query? = {
-        return queryFor(.typescript)
-    }()
+    public var typescriptQuery: Query? {
+        query(for: .typescript)
+    }
 
     /// Query for `YAML` files.
-    public private(set) lazy var yamlQuery: Query? = {
-        return queryFor(.yaml)
-    }()
+    public var yamlQuery: Query? {
+        query(for: .yaml)
+    }
 
     /// Query for `Zig` files.
-    public private(set) lazy var zigQuery: Query? = {
-        return queryFor(.zig)
-    }()
+    public var zigQuery: Query? {
+        query(for: .zig)
+    }
+
+    private static let queryCache = QueryCache(limit: 64)
 
     private func queryFor(_ codeLanguage: CodeLanguage) -> Query? {
         // get the tree-sitter language and query url if available
@@ -344,4 +270,46 @@ public class TreeSitterModel {
     }
 
     private init() {}
+}
+
+private final class QueryCache {
+    struct Key: Hashable {
+        let language: LanguageID
+        let fingerprint: LanguageFingerprint
+    }
+
+    private let limit: Int
+    private let lock = NSLock()
+    private var values: [Key: Query] = [:]
+    private var order: [Key] = []
+
+    init(limit: Int) {
+        self.limit = limit
+    }
+
+    func value(for key: Key) -> Query? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let value = values[key] else { return nil }
+        touch(key)
+        return value
+    }
+
+    func insert(_ query: Query, for key: Key) {
+        lock.lock()
+        defer { lock.unlock() }
+        values[key] = query
+        touch(key)
+        while order.count > limit {
+            let removed = order.removeFirst()
+            values[removed] = nil
+        }
+    }
+
+    private func touch(_ key: Key) {
+        if let index = order.firstIndex(of: key) {
+            order.remove(at: index)
+        }
+        order.append(key)
+    }
 }
