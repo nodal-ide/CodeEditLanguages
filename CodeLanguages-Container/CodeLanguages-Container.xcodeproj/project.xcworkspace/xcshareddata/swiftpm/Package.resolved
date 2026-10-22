@@ -220,7 +220,7 @@
     {
       "identity": "tree-sitter-php",
       "kind": "remoteSourceControl",
-      "location": "https://github.com/upperdo/tree-sitter-php.git",
+      "location": "https://github.com/nodal-ide/tree-sitter-php.git",
       "state": {
         "branch": "master",
         "revision": "58d5643086ae60e93a3746cca648363ee97c8761"
