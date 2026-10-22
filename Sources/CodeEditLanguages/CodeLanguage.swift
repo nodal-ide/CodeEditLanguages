@@ -161,8 +161,12 @@ public struct CodeLanguage {
     /// Gets the TSLanguage from `tree-sitter`
     ///
     /// Built-in languages map their ID to a statically linked grammar; contributed languages can
-    /// reuse a built-in grammar (a query-only syntax pack) by declaring it in ``grammar``.
+    /// reuse a built-in grammar (a query-only syntax pack) or load a native dylib (a native pack).
+    /// A native grammar that fails to load returns `nil`, which falls the editor back to plain text.
     private var tsLanguage: OpaquePointer? {
+        if let native = grammar.native {
+            return try? NativeGrammarLoader.shared.language(for: native)
+        }
         guard let id = grammar.builtInLanguage ?? id.treeSitterLanguage else { return nil }
         switch id {
         case .agda:

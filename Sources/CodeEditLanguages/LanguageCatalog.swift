@@ -6,14 +6,21 @@ import SwiftTreeSitter
 public struct GrammarReference: Hashable, Sendable {
     public let identifier: String
     public let builtInLanguage: TreeSitterLanguage?
+    /// Set when the grammar is a native dylib contributed by a trusted pack.
+    public let native: NativeGrammarSpec?
 
-    public init(identifier: String, builtInLanguage: TreeSitterLanguage? = nil) {
+    public init(identifier: String, builtInLanguage: TreeSitterLanguage? = nil, native: NativeGrammarSpec? = nil) {
         self.identifier = identifier
         self.builtInLanguage = builtInLanguage
+        self.native = native
     }
 
     public init(_ language: TreeSitterLanguage) {
         self.init(identifier: language.rawValue, builtInLanguage: language)
+    }
+
+    public init(native: NativeGrammarSpec, identifier: String) {
+        self.init(identifier: identifier, native: native)
     }
 }
 
@@ -203,6 +210,9 @@ public struct LanguageCatalog {
 
 final class LanguageFingerprintCache {
     static let shared = LanguageFingerprintCache()
+    // PERF: unbounded map keyed by language identity + query file mtimes. Catalogs rebuild rarely
+    // and the key set is the workspace language count; evict if profiling shows growth across
+    // repeated catalog rebuilds in long-lived sessions.
 
     private struct CacheKey: Hashable {
         let id: LanguageID
@@ -224,7 +234,7 @@ final class LanguageFingerprintCache {
         let key = CacheKey(
             id: language.id,
             tsName: language.tsName,
-            grammar: language.grammar.identifier,
+            grammar: grammarIdentity(language.grammar),
             queryFiles: queryFiles
         )
 
@@ -238,7 +248,7 @@ final class LanguageFingerprintCache {
         var hasher = SHA256()
         hasher.update(data: Data(language.id.rawValue.utf8))
         hasher.update(data: Data(language.tsName.utf8))
-        hasher.update(data: Data(language.grammar.identifier.utf8))
+        hasher.update(data: Data(grammarIdentity(language.grammar).utf8))
         hasher.update(data: Data(String(Language.version).utf8))
         for extensionName in language.extensions.sorted() {
             hasher.update(data: Data(extensionName.utf8))
@@ -258,5 +268,15 @@ final class LanguageFingerprintCache {
         values[key] = fingerprint
         lock.unlock()
         return fingerprint
+    }
+
+    private func grammarIdentity(_ grammar: GrammarReference) -> String {
+        guard let native = grammar.native else { return grammar.identifier }
+        return [
+            grammar.identifier,
+            native.path.resolvingSymlinksInPath().standardizedFileURL.path,
+            native.symbol,
+            native.expectedSHA256 ?? ""
+        ].joined(separator: "\u{1e}")
     }
 }

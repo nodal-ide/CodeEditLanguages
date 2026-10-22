@@ -59,6 +59,37 @@ final class ContributedLanguageTests: XCTestCase {
         XCTAssertNotNil(query)
     }
 
+    func testNativeGrammarFingerprintTracksConsentHash() throws {
+        let highlights = try writeQuery("(comment) @comment\n")
+        let packRoot = try XCTUnwrap(directory)
+        let grammar = packRoot.appendingPathComponent("libtree-sitter-sample.dylib")
+        try Data([0x01]).write(to: grammar)
+
+        func language(hash: String) -> CodeLanguage {
+            CodeLanguage(
+                id: LanguageID(rawValue: "sample"),
+                tsName: "sample",
+                extensions: ["sample"],
+                lineCommentString: "",
+                rangeCommentStrings: ("<!--", "-->"),
+                grammar: GrammarReference(
+                    native: NativeGrammarSpec(
+                        path: grammar,
+                        symbol: "tree_sitter_sample",
+                        expectedSHA256: hash,
+                        packRoot: packRoot
+                    ),
+                    identifier: "sample"
+                ),
+                queryURLs: ["highlights": highlights]
+            )
+        }
+
+        let first = language(hash: String(repeating: "a", count: 64))
+        let second = language(hash: String(repeating: "b", count: 64))
+        XCTAssertNotEqual(first.fingerprint, second.fingerprint)
+    }
+
     func testContributedLanguageFingerprintTracksQueryContent() throws {
         let first = try contributedLanguage()
         let firstFingerprint = first.fingerprint
