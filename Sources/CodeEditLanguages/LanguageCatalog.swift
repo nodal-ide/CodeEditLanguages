@@ -82,6 +82,15 @@ public struct LanguageCatalog {
 
     public let languages: [CodeLanguage]
 
+    /// A compiled first-line detection pattern and the language it selects.
+    struct FirstLineMatcher {
+        let languageID: LanguageID
+        let regex: NSRegularExpression
+    }
+
+    /// First-line matchers in catalog order (built-ins first, then contributed packs in load order).
+    let firstLineMatchers: [FirstLineMatcher]
+
     private let byID: [LanguageID: CodeLanguage]
     private let byExtension: [String: CodeLanguage]
     private let byFileName: [String: CodeLanguage]
@@ -94,6 +103,7 @@ public struct LanguageCatalog {
         var byExtension: [String: CodeLanguage] = [:]
         var byFileName: [String: CodeLanguage] = [:]
         var byIdentifier: [String: CodeLanguage] = [:]
+        var firstLineMatchers: [FirstLineMatcher] = []
 
         for language in languages where byID[language.id] == nil {
             byID[language.id] = language
@@ -126,11 +136,25 @@ public struct LanguageCatalog {
                 }
             }
         }
+        // PERF: patterns are compiled once per catalog build, never per detection call; detection runs
+        // once per file open, so the catalog build is the only place a regex allocation is acceptable.
+        for language in languages {
+            for pattern in language.firstLinePatterns {
+                guard let regex = try? NSRegularExpression(
+                    pattern: pattern,
+                    options: [.caseInsensitive]
+                ) else {
+                    continue
+                }
+                firstLineMatchers.append(FirstLineMatcher(languageID: language.id, regex: regex))
+            }
+        }
 
         self.byID = byID
         self.byExtension = byExtension
         self.byFileName = byFileName
         self.byIdentifier = byIdentifier
+        self.firstLineMatchers = firstLineMatchers
     }
 
     public func language(for id: LanguageID) -> CodeLanguage? {

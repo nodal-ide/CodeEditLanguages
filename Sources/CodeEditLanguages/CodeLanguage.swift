@@ -27,7 +27,9 @@ public struct CodeLanguage {
         parentURL: URL? = nil,
         highlights: Set<String>? = nil,
         additionalIdentifiers: Set<String> = [],
-        resourceURL: URL? = nil
+        resourceURL: URL? = nil,
+        queryURLs: [String: URL] = [:],
+        firstLinePatterns: [String] = []
     ) {
         self.id = id
         self.tsName = tsName
@@ -37,10 +39,12 @@ public struct CodeLanguage {
         self.documentationCommentStrings = documentationCommentStrings
         self.grammar = grammar ?? id.treeSitterLanguage.map { GrammarReference($0) }
             ?? GrammarReference(identifier: id.rawValue)
-        self.parentQueryURL = parentURL
+        self.parentQueryURLOverride = parentURL
         self.additionalHighlights = highlights
         self.additionalIdentifiers = additionalIdentifiers
         self.resourceURL = resourceURL ?? Bundle.module.resourceURL
+        self.queryURLs = queryURLs
+        self.firstLinePatterns = firstLinePatterns
     }
 
     /// The ID of the language
@@ -68,10 +72,28 @@ public struct CodeLanguage {
     public let documentationCommentStrings: Set<DocumentationComments>
 
     /// The query URL of a language this language inherits from. (e.g.: C for C++)
-    public let parentQueryURL: URL?
+    ///
+    /// `nil` for contributed languages that declare the parent query in ``queryURLs``.
+    public let parentQueryURLOverride: URL?
+
+    /// Explicit query files, keyed by query name (`highlights`, `injections`, `folds`, …).
+    ///
+    /// Built-in languages resolve queries inside their bundle; contributed languages (for example
+    /// extension syntax packs) ship their queries outside the bundle and list them here.
+    public let queryURLs: [String: URL]
+
+    /// Regular expressions matched against the first line of a document, in declaration order.
+    ///
+    /// This is the last detection tier, after file name, extension, shebang, and modeline.
+    public let firstLinePatterns: [String]
 
     /// Additional highlight file names (e.g.: JSX for JavaScript)
     public let additionalHighlights: Set<String>?
+
+    /// The query URL of a language this language inherits from. (e.g.: C for C++)
+    public var parentQueryURL: URL? {
+        queryURLs["parent"] ?? parentQueryURLOverride
+    }
 
     /// The query URL for the language if available
     public var queryURL: URL? {
@@ -129,13 +151,19 @@ public struct CodeLanguage {
     }
 
     internal func queryURL(for highlights: String = "highlights") -> URL? {
-        resourceDirectoryURL?
+        if let override = queryURLs[highlights] {
+            return override
+        }
+        return resourceDirectoryURL?
             .appendingPathComponent("tree-sitter-\(tsName)/\(highlights).scm")
     }
 
     /// Gets the TSLanguage from `tree-sitter`
+    ///
+    /// Built-in languages map their ID to a statically linked grammar; contributed languages can
+    /// reuse a built-in grammar (a query-only syntax pack) by declaring it in ``grammar``.
     private var tsLanguage: OpaquePointer? {
-        guard let id = id.treeSitterLanguage else { return nil }
+        guard let id = grammar.builtInLanguage ?? id.treeSitterLanguage else { return nil }
         switch id {
         case .agda:
             return tree_sitter_agda()
